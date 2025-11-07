@@ -26,7 +26,7 @@ COPY . ./
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 8080	
 
 # Command to run the app using serve
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["serve", "-s", "build", "-l", "8080"]
