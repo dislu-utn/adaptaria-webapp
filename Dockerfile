@@ -4,7 +4,7 @@ FROM node:alpine3.19
 WORKDIR /app
 
 # Set react .env vars
-ARG REACT_APP_API_URL=https://adaptariaback-884339239503.southamerica-east1.run.app
+ARG REACT_APP_API_URL=https://api.adaptaria.adaptardislu.ddnsfree.com/
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
 ARG GENERATE_SOURCEMAP=false
