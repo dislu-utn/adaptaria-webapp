@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Button, Card, CardBody, CardHeader, CardTitle, Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faClock, faExclamationCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +7,7 @@ import { faCheckCircle, faClock, faExclamationCircle, IconDefinition } from "@fo
 import PageWrapper from "../../components/PageWrapper";
 import { post } from "../../utils/network";
 import { SwalUtils } from "../../utils/SwalUtils";
+import { RootState } from "../../redux/store";
 
 type SyncStatus = "not_started" | "in_progress" | "synchronized" | "error";
 
@@ -18,6 +20,7 @@ interface StatusConfig {
 }
 
 export const DisluIntegrationPage = () => {
+  const user = useSelector((state: RootState) => state.user);
   const [status, setStatus] = useState<SyncStatus>("not_started");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -62,19 +65,27 @@ export const DisluIntegrationPage = () => {
     try {
       setIsSubmitting(true);
       
-      const response = await post('/connector/sync', {});
+      if (!user.institute?.id) {
+        SwalUtils.errorSwal(
+          "Error",
+          "No se pudo obtener el ID de la institución",
+          "Aceptar",
+          () => {console.log("")}
+        );
+        setIsSubmitting(false);
+        return;
+      }
+      
+      setStatus("in_progress");
+      
+      const response = await post('/connector/sync', { id: user.institute.id });
       
       if (response.ok) {
-        setStatus("in_progress");
-        
-        // Simular el proceso de sincronización (1 minuto)
-        setTimeout(() => {
-          setStatus("synchronized");
-        }, 60000);
+        setStatus("synchronized");
         
         SwalUtils.successSwal(
-          "Sincronización iniciada",
-          "La sincronización con Dislu se ha iniciado correctamente",
+          "Sincronización completada",
+          "La sincronización con Dislu se ha completado correctamente",
           "Aceptar",
           () => {console.log("")},
           () => {console.log("")}
@@ -83,7 +94,7 @@ export const DisluIntegrationPage = () => {
         setStatus("error");
         SwalUtils.errorSwal(
           "Error",
-          "No se pudo iniciar la sincronización",
+          "No se pudo completar la sincronización",
           "Aceptar",
           () => {console.log("")}
         );
