@@ -20,6 +20,7 @@ import { StudentsSurveyDashboardPage } from '../pages/directors/StudentsSurveyDa
 import { TeachersSurveyDashboardPage } from '../pages/directors/TeachersSurveyDashboardPage';
 import { DirectorLearningTypeDashboardPage } from '../pages/directors/DirectorLearningTypeDashboardPage';
 import { UserCreationMassivePage } from './directors/UserCreationMassivePage';
+import { DisluIntegrationPage } from './directors/DisluIntegrationPage';
 
 import Sidebar from '../components/Sidebar';
 import { get, del } from '../utils/network';
@@ -151,6 +152,7 @@ export const Index = () => {
           <Route path="/teachers-survey" element={<TeachersSurveyDashboardPage />} />
           <Route path="/students/profile" element={<DirectorLearningTypeDashboardPage />} />
           <Route path="/users/bulk" element={<UserCreationMassivePage />} />
+          <Route path="/integrations/dislu" element={<DisluIntegrationPage />} />
           <Route path="*" element={<Navigate to={DEFAULT_PAGE_ROLE.DIRECTOR} replace />} />
         </>
       )}

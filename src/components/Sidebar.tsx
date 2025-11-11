@@ -187,6 +187,14 @@ export default function Sidebar() {
                 </NavItem>
               </NavLink>
 
+              <span className='sidebar-section-title'>Integraciones</span>
+              <NavLink to={'/integrations/dislu'} end className={({ isActive }) => isActive ? 'sidebar-navlink-active' : 'sidebar-navlink-inactive'}>
+                <NavItem className='sidebar-navlink-item'>
+                  <FontAwesomeIcon icon={faCircle} className="sidebar-dot" />
+                  <span>Dislu</span>
+                </NavItem>
+              </NavLink>
+
             </div>
           )}
         </div>
