@@ -52,7 +52,10 @@ export const DirectorLearningTypeDashboardPage = () => {
       .then(res => res.data)
       .then((data: ICourse[]) => {
         const allCoursesOption = { id: '', courseName: 'Todos los cursos' };
-        setCourses([allCoursesOption, ...data]);
+        setCourses([allCoursesOption, ...(data || [])]);
+      })
+      .catch(() => {
+        setCourses([{ id: '', courseName: 'Todos los cursos' }]);
       });
 
     fetchStudents();
@@ -64,7 +67,10 @@ export const DirectorLearningTypeDashboardPage = () => {
       .then(res => res.json())
       .then(res => res.data)
       .then((data: IStudent[]) => {
-        setStudents(data);
+        setStudents(data || []);
+      })
+      .catch(() => {
+        setStudents([]);
       });
   };
 
@@ -73,12 +79,19 @@ export const DirectorLearningTypeDashboardPage = () => {
       .then(res => res.json())
       .then(res => res.data)
       .then((data: any[]) => {
+        if (!data || !Array.isArray(data)) {
+          setTeachers([]);
+          return;
+        }
         setTeachers(data.map(teacherObject => ({
           id: teacherObject.user._id,
           firstName: teacherObject.user.firstName,
           lastName: teacherObject.user.lastName,
           email: teacherObject.user.email,
         })));
+      })
+      .catch(() => {
+        setTeachers([]);
       });
   };
 
