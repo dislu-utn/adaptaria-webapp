@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Button, Card, CardBody, CardHeader, CardTitle, Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faClock, faExclamationCircle, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 import PageWrapper from "../../components/PageWrapper";
-import { post } from "../../utils/network";
+import { get, post } from "../../utils/network";
 import { SwalUtils } from "../../utils/SwalUtils";
 import { RootState } from "../../redux/store";
 
-type SyncStatus = "not_started" | "in_progress" | "synchronized" | "error";
+type SyncStatus = "not_started" | "in_progress" | "synchronized" | "error" | "loading";
 
 interface StatusConfig {
   text: string;
@@ -21,11 +21,19 @@ interface StatusConfig {
 
 export const DisluIntegrationPage = () => {
   const user = useSelector((state: RootState) => state.user);
-  const [status, setStatus] = useState<SyncStatus>("not_started");
+  const [status, setStatus] = useState<SyncStatus>("loading");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getStatusConfig = (): StatusConfig => {
     switch (status) {
+      case "loading":
+        return {
+          text: "Verificando...",
+          color: "#6b7280",
+          bgColor: "#f3f4f6",
+          icon: faClock,
+          description: "Verificando el estado de sincronización"
+        };
       case "in_progress":
         return {
           text: "En proceso",
@@ -60,6 +68,35 @@ export const DisluIntegrationPage = () => {
         };
     }
   };
+
+  useEffect(() => {
+    const checkSyncStatus = async () => {
+      try {
+        if (!user.institute?.id) {
+          setStatus("not_started");
+          return;
+        }
+
+        const response = await get(`/connector/sync/${user.institute.id}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data === true) {
+            setStatus("synchronized");
+          } else {
+            setStatus("not_started");
+          }
+        } else {
+          setStatus("not_started");
+        }
+      } catch (error) {
+        console.error("Error al verificar estado de sincronización:", error);
+        setStatus("not_started");
+      }
+    };
+
+    checkSyncStatus();
+  }, [user.institute?.id]);
 
   const handleSync = async () => {
     try {
@@ -168,7 +205,7 @@ export const DisluIntegrationPage = () => {
                 block
                 size="lg"
                 onClick={handleSync}
-                disabled={isSubmitting || status === "in_progress" || status === "synchronized"}
+                disabled={isSubmitting || status === "in_progress" || status === "synchronized" || status === "loading"}
                 style={{
                   backgroundColor: "#4ea8de",
                   borderColor: "#4ea8de",
@@ -180,6 +217,11 @@ export const DisluIntegrationPage = () => {
                   <>
                     <Spinner size="sm" className="me-2" />
                     Iniciando...
+                  </>
+                ) : status === "loading" ? (
+                  <>
+                    <Spinner size="sm" className="me-2" />
+                    Verificando...
                   </>
                 ) : status === "synchronized" ? (
                   "Migración Completada"
