@@ -100,8 +100,6 @@ export const DisluIntegrationPage = () => {
 
   const handleSync = async () => {
     try {
-      setIsSubmitting(true);
-      
       if (!user.institute?.id) {
         SwalUtils.errorSwal(
           "Error",
@@ -109,13 +107,15 @@ export const DisluIntegrationPage = () => {
           "Aceptar",
           () => {console.log("")}
         );
-        setIsSubmitting(false);
         return;
       }
       
+      // Cambiar estado a "en proceso" inmediatamente
+      setIsSubmitting(true);
       setStatus("in_progress");
       
-      const response = await post('/connector/sync', { id: user.institute.id });
+      // Esperar a que termine la sincronización (timeout de 5 minutos)
+      const response = await post('/connector/sync', { id: user.institute.id } );
       
       if (response.ok) {
         setStatus("synchronized");

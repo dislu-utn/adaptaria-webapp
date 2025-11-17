@@ -1,6 +1,6 @@
 import { API_URL } from "../config";
 
-const TIMEOUT = 30000;
+const TIMEOUT = 300000;
 
 export const DEFAULT_HEADERS = {
   Accept: 'application/json',
